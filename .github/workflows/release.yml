@@ -1,10 +1,12 @@
 # Cut a release:
-#   set <Version> in companion/DiceyA11y.csproj, commit, then
+#   set <Version> in DiceyA11y/companion/DiceyA11y.csproj, commit, then
 #   git tag v1.2.3 && git push --follow-tags
 #
 # Unlike the Unity mods, everything here builds without the game: the launcher is plain
 # .NET, and the bridge is built from bridge/lime_exports.txt (export names only).
 # "Run workflow" by hand builds the same zip as an artifact without releasing anything.
+# The repo root holds DiceyA11y/ and the ignored game_src/: every run step works inside
+# DiceyA11y/, while the upload paths below are relative to the repo root.
 name: Release
 
 on:
@@ -26,6 +28,7 @@ jobs:
     defaults:
       run:
         shell: pwsh
+        working-directory: DiceyA11y
     steps:
       - uses: actions/checkout@v5
 
@@ -74,13 +77,13 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: DiceyA11y
-          path: DiceyA11y-v*.zip
+          path: DiceyA11y/DiceyA11y-v*.zip
 
       - name: Create GitHub Release
         if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v3
         with:
           files: |
-            DiceyA11y-v*.zip
-            installer/DiceyDungeonsAccessibilityInstaller.exe
+            DiceyA11y/DiceyA11y-v*.zip
+            DiceyA11y/installer/DiceyDungeonsAccessibilityInstaller.exe
           generate_release_notes: true
