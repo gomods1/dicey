@@ -67,9 +67,11 @@ jobs:
           $zip = Get-Item DiceyA11y-v*.zip
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           $names = [System.IO.Compression.ZipFile]::OpenRead($zip.FullName).Entries.FullName
-          foreach ($f in 'DiceyA11y/DiceyA11y.exe', 'DiceyA11y/DiceyA11y.dll', 'DiceyA11y/prism.dll', 'DiceyA11y/bridge/lime.ndll', 'DiceyA11y/readme.html') {
+          foreach ($f in 'DiceyA11y/DiceyA11y.exe', 'DiceyA11y/prism.dll', 'DiceyA11y/bridge/lime.ndll', 'DiceyA11y/readme.html') {
             if ($names -notcontains $f) { throw "$f is missing from $($zip.Name)" }
           }
+          # Self-contained single file: players need no .NET runtime. A runtimeconfig means it regressed.
+          if ($names -contains 'DiceyA11y/DiceyA11y.runtimeconfig.json') { throw "The launcher was published framework-dependent." }
           $bridge = [System.Text.Encoding]::ASCII.GetString([System.IO.File]::ReadAllBytes("release/DiceyA11y/bridge/lime.ndll"))
           if (-not $bridge.Contains("diceya11y_bridge_marker")) { throw "The bridge has no marker export; installers would refuse it." }
           if (-not (Test-Path installer/DiceyDungeonsAccessibilityInstaller.exe)) { throw "installer exe missing" }
