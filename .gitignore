@@ -3,6 +3,7 @@ DiceyA11y/companion/bin/
 DiceyA11y/companion/obj/
 release/
 DiceyA11y*.zip
+*-offline.exe
 __pycache__/
 
 # Runtime logs and settings written next to the executable
